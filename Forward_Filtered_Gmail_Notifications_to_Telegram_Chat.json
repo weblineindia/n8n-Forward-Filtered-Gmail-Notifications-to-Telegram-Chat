@@ -1,0 +1,163 @@
+{
+  "name": "Forward Filtered Gmail Notifications to Telegram Chat",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Forward Filtered Gmail Notifications to Telegram Chat\n",
+        "height": 300,
+        "width": 1000,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -60,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "99441348-1d5d-459f-961f-48bd593144f2",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Description :\n### This n8n workflow automatically forwards incoming Gmail emails to a Telegram chat only if the email subject contains specific keywords (like \"Urgent\" or \"Server Down\"). The workflow extracts key details such as the sender, subject, and message body, and sends them as a formatted message to a specified Telegram chat. This is useful for real-time notifications, security alerts, or monitoring important emails directly from Telegram — filtering out unnecessary emails.",
+        "height": 200,
+        "width": 1000,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -60,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "eadf565c-e753-4682-a8c2-6bc630a30a27",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        20,
+        100
+      ],
+      "id": "bb2a78d7-91ba-4e8c-a9f1-af270a50bd8f",
+      "name": "Incoming Email Monitor",
+      "notesInFlow": false,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5V09QSJCeHoQoKUp",
+          "name": "SM MaryP (Gmail)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2496d01f-dbd5-4e23-84c3-f78decb87697",
+              "leftValue": "={{ $json.Subject }}",
+              "rightValue": "Urgent",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "274e9e05-5c74-487e-851d-0ca62210cb99",
+              "leftValue": "={{ $json.Subject }}",
+              "rightValue": "Server Down",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        340,
+        100
+      ],
+      "id": "addffc7b-ef58-4fb5-9275-3db6fd84f4c0",
+      "name": "Email Validation Check"
+    },
+    {
+      "parameters": {
+        "text": "=From : {{ $json.From }}\nSubject :{{ $json.Subject }}\nMessage : {{ $json.snippet }}\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        80
+      ],
+      "id": "e87d46b6-efc6-466f-a708-bfbf34bf001b",
+      "name": "Send Telegram Message",
+      "webhookId": "c8f1d16f-b698-4af9-a795-9aaa277c2bf6",
+      "notesInFlow": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Incoming Email Monitor": {
+      "main": [
+        [
+          {
+            "node": "Email Validation Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Validation Check": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "caf5eedb-4c6b-4bfa-9a0a-2d868291a83c",
+  "meta": {
+    "instanceId": "14e4c77104722ab186539dfea5182e419aecc83d85963fe13f6de862c875ebfa"
+  },
+  "id": "AvXlqUiuc1qJSwxf",
+  "tags": []
+}
